@@ -64,6 +64,15 @@ Battery.onHasSubscribersChange = function() {
 };
 
 /**
+ * Get current battery status info
+ *
+ * @param {Object} info            keys: level, isPlugged
+ */
+Battery.prototype.getCurrentStatus = function(success, error) {
+    exec(success, error, 'Battery', 'getCurrentStatus', []);
+};
+
+/**
  * Callback for battery status
  *
  * @param {Object} info            keys: level, isPlugged

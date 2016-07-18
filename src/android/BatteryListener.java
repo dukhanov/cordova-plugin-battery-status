@@ -90,6 +90,13 @@ public class BatteryListener extends CordovaPlugin {
             return true;
         }
 
+        else if (action.equals("getCurrentStatus")) {
+            Intent batteryIntent = webView.getContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            JSONObject batteryInfo = getBatteryInfo(batteryIntent);
+            callbackContext.success(batteryInfo);
+            return true;
+        }
+
         return false;
     }
 
@@ -149,9 +156,9 @@ public class BatteryListener extends CordovaPlugin {
     }
 
     /**
-     * Create a new plugin result and send it back to JavaScript
+     * Send plugin result to JavaScript
      *
-     * @param connection the network info to set as navigator.connection
+     * @param info the current battery information
      */
     private void sendUpdate(JSONObject info, boolean keepCallback) {
         if (this.batteryCallbackContext != null) {
