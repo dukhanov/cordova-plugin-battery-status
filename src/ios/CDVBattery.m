@@ -129,6 +129,15 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceBatteryLevelDidChangeNotification object:nil];
 }
 
+/* get current battery status info */
+- (void)getCurrentStatus:(CDVInvokedUrlCommand*)command
+{
+	NSDictionary* batteryData = [self getBatteryStatus];
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:batteryData];
+	[self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 - (void)pluginInitialize
 {
     self.state = UIDeviceBatteryStateUnknown;
