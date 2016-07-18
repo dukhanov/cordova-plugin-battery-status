@@ -36,5 +36,6 @@
 - (NSDictionary*)getBatteryStatus;
 - (void)start:(CDVInvokedUrlCommand*)command;
 - (void)stop:(CDVInvokedUrlCommand*)command;
+- (void)getCurrentStatus:(CDVInvokedUrlCommand*)command;
 - (void)dealloc;
 @end
