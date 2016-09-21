@@ -26,6 +26,7 @@
 @implementation CDVBattery
 
 @synthesize state, level, callbackId, isPlugged;
+static bool isSubscribedOnBatteryEvents = NO;
 
 /*  determining type of event occurs on JavaScript side
 - (void) updateBatteryLevel:(NSNotification*)notification
@@ -74,6 +75,10 @@
 - (NSDictionary*)getBatteryStatus
 {
     UIDevice* currentDevice = [UIDevice currentDevice];
+    if(currentDevice.isBatteryMonitoringEnabled == NO && isSubscribedOnBatteryEvents) {
+        [currentDevice setBatteryMonitoringEnabled:YES];
+    }
+    
     UIDeviceBatteryState currentState = [currentDevice batteryState];
 
     isPlugged = FALSE; // UIDeviceBatteryStateUnknown or UIDeviceBatteryStateUnplugged
@@ -104,13 +109,18 @@
 - (void)start:(CDVInvokedUrlCommand*)command
 {
     self.callbackId = command.callbackId;
+    UIDevice* currentDevice = [UIDevice currentDevice];
+    if(!isSubscribedOnBatteryEvents) {
+        if (currentDevice.batteryMonitoringEnabled == NO) {
+            [currentDevice setBatteryMonitoringEnabled:YES];
+        }
 
-    if ([UIDevice currentDevice].batteryMonitoringEnabled == NO) {
-        [[UIDevice currentDevice] setBatteryMonitoringEnabled:YES];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateBatteryStatus:)
                                                      name:UIDeviceBatteryStateDidChangeNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateBatteryStatus:)
                                                      name:UIDeviceBatteryLevelDidChangeNotification object:nil];
+        
+        isSubscribedOnBatteryEvents = YES;
     }
 }
 
@@ -127,6 +137,8 @@
     [[UIDevice currentDevice] setBatteryMonitoringEnabled:NO];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceBatteryStateDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceBatteryLevelDidChangeNotification object:nil];
+    
+    isSubscribedOnBatteryEvents = NO;
 }
 
 /* get current battery status info */
